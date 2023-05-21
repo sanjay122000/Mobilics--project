@@ -1,0 +1,41 @@
+import boto3
+
+def create_cloudwatch_alarm(instance_id):
+    region = 'ap-south-1'  # Specify the desired region (Mumbai)
+    cloudwatch = boto3.client('cloudwatch', region_name=region)
+
+    alarm_name = 'HighCPUUsageAlarm'
+    alarm_description = 'Alert triggered when CPU usage exceeds 80% for five consecutive minutes'
+    metric_name = 'CPUUtilization'
+    namespace = 'AWS/EC2'
+    statistic = 'Average'
+    threshold = 80.0
+    period = 60  # 1 minute
+    evaluation_periods = 5
+    comparison_operator = 'GreaterThanOrEqualToThreshold'
+
+    dimensions = [
+        {
+            'Name': 'InstanceId',
+            'Value': instance_id
+        }
+    ]
+
+    response = cloudwatch.put_metric_alarm(
+        AlarmName=alarm_name,
+        AlarmDescription=alarm_description,
+        MetricName=metric_name,
+        Namespace=namespace,
+        Statistic=statistic,
+        Dimensions=dimensions,
+        Threshold=threshold,
+        Period=period,
+        EvaluationPeriods=evaluation_periods,
+        ComparisonOperator=comparison_operator
+    )
+
+    print('CloudWatch alarm created successfully!')
+
+instance_id = 'i-00b00c8fd71921727'
+
+create_cloudwatch_alarm(instance_id)
